@@ -321,5 +321,77 @@ If the implementation is easy to explain, it may be a good idea.
 ---
 
 # **Mypy**
-Split pages by horizontal ruler (`---`). It's very simple! :satisfied:
+- statická kontrola typů
+- na `mypy` založeno `PEP 484 – Type Hints` - přidání typů k proměnným, se kterými pracujeme
+    ```
+    def greeting(name: str) -> str:
+        return 'Hello ' + name
+    ```
 
+# **Mypy**
+
+#### Základní typy
+- `str, int, float, bool, None` - podobnost s datovými typy v [`numpy`](https://numpy.org/doc/stable/user/basics.types.html)
+
+---
+
+# **Mypy**
+
+#### Datové struktury
+- z modulu `typing`:
+    ```
+    from typing import TypeVar, Iterable, List, Callable
+    def feeder(get_next_item: Callable[List[str], str]) -> None:
+        pass
+    ```
+---
+
+# **Mypy**
+
+#### Generika
+```
+from typing import TypeVar, Any
+
+T = TypeVar('T', int, float, complex)
+
+def func(x: T = 1.0, y: Any) -> None:
+    pass
+```
+
+---
+# **Mypy**
+
+#### Specifikace parametrů
+```
+from typing import Union, Optional, List, Dict
+def func(x: Union[str, int], y: Optional[Dict[str, List[int]]]):
+    pass
+```
+---
+
+
+# **Mypy - použití**
+
+- instalace přes `pip`
+- `mypy <file>/<folder>`
+
+1. Napište program, který načte od uživatele vstup a přičtěte k němu číslo `1`. Tento program zkontrolujte pomocí `mypy`.
+
+2. Zkontrolujte soubor `mypy/ex1.py`, kde může nastat chyba? Jak byste soubor upravili?
+
+---
+
+# **Mypy - použití**
+
+3. Napište funkci, která přijmá pouze `float` a `int` a tyto dvě čísla sečte. Zkontrolujte pomocí `mypy`.
+
+- Kontrola typů z jiného modulu:
+```
+from pathlib import Path
+
+def load_template(template_path: Path, name: str) -> str:
+    # Mypy knows that `file_path` has a `read_text` method that returns a str
+    template = template_path.read_text()
+    # ...so it understands this line type checks
+    return template.replace('USERNAME', name)
+```
