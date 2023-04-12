@@ -9,6 +9,18 @@ backgroundColor: #fff
 #### Clean code & code style ~ Jan Havlík `xhavlik@mendelu.cz`
 
 ---
+# **Co nás čeká**
+
+- PEP 8 - základy psaní kódu v Pythonu 
+- Tooling:
+    - `isort`
+    - `black`
+    - `pylint`
+    - `mypy`
+    - `flake8`
+- Pomocník - AI?
+
+---
 # **PEP 8**
 
 - `P`ython `E`nhancement `P`roposals
@@ -292,10 +304,46 @@ If the implementation is easy to explain, it may be a good idea.
 - statická analýza kódu - bez nutnosti spuštění
 - hledání chyb, mrtvého kódu, `code smells`
 - navrhuje refaktor kódu
+- spuštění pomocí `pylint [options] module` (`pylint .`)
+- použití `.pylintrc`, případně cmd options
 
-1. Zformátujte soubor `pylint/simplecaesar.py` pomocí návrhů `pylintu`
-2. Upravte soubor `pylint/return.py` tak, aby se nezobrazovala hláška `function-redefined`
-3. Upravte soubor `pylint/return.py` tak, aby `pylint` ignoroval chybu `too-many-return-statements`
+---
+
+# [**Pylint**](https://pypi.org/project/pylint/)
+```
+class Test:
+
+    def __init__(self):
+        import math; print(math.PI)
+        x = 5; y = "hello"; print(x + y)
+
+    def access_dict(self):
+        my_dict = {"name": "Alice", "age": 30}; print(my_dict['city'])
+```
+
+---
+
+# [**Pylint**](https://pypi.org/project/pylint/)
+
+```
+pylint/simplecaesar.py:3:0: C0303: Trailing whitespace (trailing-whitespace)
+pylint/simplecaesar.py:7:0: C0303: Trailing whitespace (trailing-whitespace)
+pylint/simplecaesar.py:9:0: C0304: Final newline missing (missing-final-newline)
+pylint/simplecaesar.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+pylint/simplecaesar.py:2:0: C0115: Missing class docstring (missing-class-docstring)
+pylint/simplecaesar.py:5:8: C0415: Import outside toplevel (math) (import-outside-toplevel)
+pylint/simplecaesar.py:5:21: C0321: More than one statement on a single line (multiple-statements)
+pylint/simplecaesar.py:5:27: E1101: Module 'math' has no 'PI' member (no-member)
+pylint/simplecaesar.py:6:8: C0103: Variable name "x" doesn't conform to snake_case naming style (invalid-name)
+pylint/simplecaesar.py:6:15: C0321: More than one statement on a single line (multiple-statements)
+pylint/simplecaesar.py:6:15: C0103: Variable name "y" doesn't conform to snake_case naming style (invalid-name)
+pylint/simplecaesar.py:8:4: C0116: Missing function or method docstring (missing-function-docstring)
+pylint/simplecaesar.py:9:48: C0321: More than one statement on a single line (multiple-statements)
+pylint/simplecaesar.py:2:0: R0903: Too few public methods (1/2) (too-few-public-methods)
+
+------------------------------------------------------------------
+Your code has been rated at 0.00/10 (previous run: 0.00/10, +0.00)
+```
 
 ---
 
@@ -305,18 +353,37 @@ If the implementation is easy to explain, it may be a good idea.
 - použití na konkrétní adresář, soubor
 - `python -m isort .`
 
-1. Vytvořte soubor `isort.py`, kam přidáte 2 systémové importy, 2 importy třetích stran a 2 vlastní moduly (např. jedna funkce). Seřaďte tento soubor pomocí nástroje `isort`
+---
+
+# [`isort`](https://pycqa.github.io/isort/)
+
+```
+from my_module import func
+
+import numpy as np
+import math
+import pandas as pd
+```
+
+---
+
+# [`isort`](https://pycqa.github.io/isort/)
+
+```
+import math
+
+import numpy as np
+import pandas as pd
+from my_module import func
+```
 
 ---
 
 # [`black`](https://github.com/psf/black)
 
-- automatické formátování kódu
+- automatické (**pouze**) formátování kódu
 - použití na konkrétní adresář, soubor
 - `python -m black {source_file_or_directory}...`
-
-1. Zformátujte soubor `black/simplecaesar.py` pomocí nástroje `black` - jak se liší výstup oproti pylintu?
-2. Zformátujte soubor `black/black2.py` pomocí nástroje `black` - proč dojde k chybě?
 
 ---
 
@@ -327,7 +394,7 @@ If the implementation is easy to explain, it may be a good idea.
     def greeting(name: str) -> str:
         return 'Hello ' + name
     ```
-
+---
 # **Mypy**
 
 #### Základní typy
@@ -340,9 +407,15 @@ If the implementation is easy to explain, it may be a good idea.
 #### Datové struktury
 - z modulu `typing`:
     ```
-    from typing import TypeVar, Iterable, List, Callable
-    def feeder(get_next_item: Callable[List[str], str]) -> None:
+    from typing import TypeVar, Iterable, List
+
+    def getter(array: List[str], item: str) -> str:
+        return item
+
+    def feeder(str) -> None:
         pass
+
+    feeder(getter(['A', 'B', 'C'], 'A'))
     ```
 ---
 
@@ -367,7 +440,43 @@ from typing import Union, Optional, List, Dict
 def func(x: Union[str, int], y: Optional[Dict[str, List[int]]]):
     pass
 ```
+
 ---
+# **Mypy**
+
+#### Typování proměnných
+```
+age: int = 1
+
+# Neni potreba inicializace
+a: int 
+
+# Typovani podminek
+child: bool
+if age < 18:
+    child = True
+else:
+    child = False
+```
+
+---
+# **Mypy**
+
+#### Typování proměnných - datové typy
+```
+# redundantni - mypy dela automaticky
+x: int = 1
+z: float = 1.0
+
+# python < 3.9
+from typing import List, Dict
+x: List[int] = [1]
+x: Dict[str, float] = {"field": 2.0}
+```
+
+
+---
+
 
 
 # **Mypy - použití**
@@ -377,21 +486,77 @@ def func(x: Union[str, int], y: Optional[Dict[str, List[int]]]):
 
 1. Napište program, který načte od uživatele vstup a přičtěte k němu číslo `1`. Tento program zkontrolujte pomocí `mypy`.
 
-2. Zkontrolujte soubor `mypy/ex1.py`, kde může nastat chyba? Jak byste soubor upravili?
+```
+input_number = input("Zadej číslo: ")
+print("Výsledek je: ", input_number + 1)
+```
 
 ---
 
 # **Mypy - použití**
-
-3. Napište funkci, která přijmá pouze `float` a `int` a tyto dvě čísla sečte. Zkontrolujte pomocí `mypy`.
 
 - Kontrola typů z jiného modulu:
 ```
 from pathlib import Path
 
 def load_template(template_path: Path, name: str) -> str:
-    # Mypy knows that `file_path` has a `read_text` method that returns a str
-    template = template_path.read_text()
-    # ...so it understands this line type checks
-    return template.replace('USERNAME', name)
+    # Mypy ví, že `file_path` má metodu `read_text` a vrací `str`
+    template_length = template_path.read_text()
+    # takže tuto operaci zastaví
+    return template_length + 1
 ```
+
+---
+
+# **AI pomocníci - ChatGPT**
+
+- Vytvořeno OpenAI (GPT-4, DALL-E)
+- Nyní GPT-4
+- Pomocník formou chatu (prompt - odpověď)
+- [https://chat.openai.com/chat](https://chat.openai.com/chat)
+- Nutný účet (Microsoft, Google), ale zdarma
+
+---
+# **AI pomocníci - ChatGPT**
+
+> Write me an example python code for Fibonacci sequence both recursive and in loop complying to both pytlint and mypy standards.
+
+> Write me rc file for pylint to ignore following errors: C0114, C0115, C0116
+
+> Write the most beautiful yet complex Python algorithm on 10 lines tops
+
+> How to ...
+
+---
+
+# **AI pomocníci - ChatGPT**
+
+```
+from typing import List
+
+# Recursive solution
+def fibonacci_recursive(n: int) -> int:
+    if n <= 1:
+        return n
+    else:
+        return fibonacci_recursive(n-1) + fibonacci_recursive(n-2)
+
+# Loop solution
+def fibonacci_loop(n: int) -> List[int]:
+    fib = [0, 1]
+    for i in range(2, n+1):
+        fib.append(fib[i-1] + fib[i-2])
+    return fib
+```
+
+---
+
+# **AI pomocníci - Github copilot**
+- Párové programování s AI
+- [https://copilot.github.com/](https://copilot.github.com/)
+- Integrace pro VS Code, PyCharm, ...
+- Placené (10$/měsíc)
+
+- Nápověda podle kontextu, nebo komentářů
+- Automatické psaní unit testů pro vybraný kus kódu
+
